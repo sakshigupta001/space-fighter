@@ -30,7 +30,12 @@ public class GameView extends SurfaceView implements Runnable {
     //Adding enemies object array
     private Enemy[] enemies;
     //Adding 3 enemies you may increase the size
-    private int enemyCount = 3;
+    private int enemyCount = 1;
+
+    //Adding friends object array
+    private Friend[] friends;
+    //Adding 1 friend you may increase the size
+    private int friendCount = 1;
 
 
     //Adding an stars list
@@ -66,6 +71,12 @@ public class GameView extends SurfaceView implements Runnable {
 
         //initializing boom object
         blast = new Blast(context);
+
+        //initializing friend object array
+        friends = new Friend[enemyCount];
+        for(int i=0; i<friendCount; i++){
+            friends[i] = new Friend(context, screenX, screenY);
+        }
     }
 
     @Override
@@ -99,7 +110,7 @@ public class GameView extends SurfaceView implements Runnable {
         for(int i=0; i<enemyCount; i++){
             enemies[i].update(player.getSpeed());
 
-            //if collision occurrs with player
+            //if collision occurs with player
             if (Rect.intersects(player.getDetectCollision(), enemies[i].getDetectCollision())) {
 
                 //displaying boom at that location
@@ -109,6 +120,11 @@ public class GameView extends SurfaceView implements Runnable {
                 //moving enemy outside the left edge
                 enemies[i].setX(-300);
             }
+        }
+
+        //updating the friend coordinate with respect to player speed
+        for(int i=0; i<friendCount; i++){
+            friends[i].update(player.getSpeed());
         }
     }
 
@@ -156,6 +172,16 @@ public class GameView extends SurfaceView implements Runnable {
                     blast.getY(),
                     paint
             );
+
+            //drawing the friends
+            for (int i = 0; i < friendCount; i++) {
+                canvas.drawBitmap(
+                        friends[i].getBitmap(),
+                        friends[i].getX(),
+                        friends[i].getY(),
+                        paint
+                );
+            }
 
             //Unlocking the canvas
             surfaceHolder.unlockCanvasAndPost(canvas);

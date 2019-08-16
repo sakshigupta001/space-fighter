@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_high_score"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:paddingTop="350dp"
+    android:orientation="vertical"
+    tools:context=".HighScore"
+    android:background="@drawable/splash">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:text="WORK IN PROGRESS!! :)"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:id="@+id/textView1"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:id="@+id/textView2"
+        />
+</LinearLayout>

@@ -1,6 +1,7 @@
 package com.example.spacefighter;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -45,6 +46,24 @@ public class GameView extends SurfaceView implements Runnable {
     //defining a boom object to display blast
     private Blast blast;
 
+
+    //a screenX holder
+    int screenX;
+
+    //to count the number of Misses
+    int countMisses;
+
+    //indicator that the enemy has just entered the game screen
+    boolean flag ;
+
+    //an indicator if the game is Over
+    private boolean isGameOver ;
+
+    private int gameOverMissCount = 3;
+
+    //the score holder
+    int score;
+
     public GameView(Context context, int screenX, int screenY) {
         super(context);
 
@@ -77,6 +96,15 @@ public class GameView extends SurfaceView implements Runnable {
         for(int i=0; i<friendCount; i++){
             friends[i] = new Friend(context, screenX, screenY);
         }
+
+        this.screenX = screenX;
+
+        countMisses = 0;
+
+        isGameOver = false;
+
+        //setting the score to 0 initially
+        score = 0;
     }
 
     @Override
@@ -94,6 +122,10 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void update() {
+
+        //incrementing score as time passes
+        score++;
+
         //updating player position
         player.update();
 
@@ -108,6 +140,11 @@ public class GameView extends SurfaceView implements Runnable {
 
         //updating the enemy coordinate with respect to player speed
         for(int i=0; i<enemyCount; i++){
+
+            if(enemies[i].getX()==screenX){
+                flag = true;
+            }
+
             enemies[i].update(player.getSpeed());
 
             //if collision occurs with player
@@ -119,12 +156,42 @@ public class GameView extends SurfaceView implements Runnable {
 
                 //moving enemy outside the left edge
                 enemies[i].setX(-300);
+            } // the condition where player misses the enemy
+            else {
+                //if the enemy has just entered
+                if(flag){
+                    //if player's x coordinate is more than the enemies's x coordinate.i.e. enemy has just passed across the player
+                    if(player.getDetectCollision().exactCenterX() >= enemies[i].getDetectCollision().exactCenterX()){
+                        //increment countMisses
+                        countMisses++;
+
+                        //setting the flag false so that the else part is executed only when new enemy enters the screen
+                        flag = false;
+                        //if no of Misses is equal to 3, then game is over.
+                        if(countMisses==gameOverMissCount){
+                            //setting playing false to stop the game.
+                            playing = false;
+                            isGameOver = true;
+                        }
+                    }
+                }
             }
         }
 
         //updating the friend coordinate with respect to player speed
         for(int i=0; i<friendCount; i++){
             friends[i].update(player.getSpeed());
+
+            if(Rect.intersects(player.getDetectCollision(),friends[i].getDetectCollision())){
+
+                //displaying the boom at the collision
+                blast.setX(friends[i].getX());
+                blast.setY(friends[i].getY());
+                //setting playing false to stop the game
+                playing = false;
+                //setting the isGameOver true as the game is over
+                isGameOver = true;
+            }
         }
     }
 
@@ -146,6 +213,10 @@ public class GameView extends SurfaceView implements Runnable {
                 paint.setStrokeWidth(s.getStarWidth());
                 canvas.drawPoint(s.getX(), s.getY(), paint);
             }
+
+            //drawing the score on the game screen
+            paint.setTextSize(30);
+            canvas.drawText("YO \\m/ Score : "+score,100,50,paint);
 
             //Drawing the player
             canvas.drawBitmap(
@@ -181,6 +252,15 @@ public class GameView extends SurfaceView implements Runnable {
                         friends[i].getY(),
                         paint
                 );
+            }
+
+            //draw game Over when the game is over
+            if(isGameOver){
+                paint.setTextSize(150);
+                paint.setTextAlign(Paint.Align.CENTER);
+
+                int yPos=(int) ((canvas.getHeight() / 2) - ((paint.descent() + paint.ascent()) / 2));
+                canvas.drawText("Game Over",canvas.getWidth()/2,yPos,paint);
             }
 
             //Unlocking the canvas

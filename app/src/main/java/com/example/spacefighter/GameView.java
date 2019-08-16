@@ -37,6 +37,9 @@ public class GameView extends SurfaceView implements Runnable {
     private ArrayList<Star> stars = new
             ArrayList<Star>();
 
+    //defining a boom object to display blast
+    private Blast blast;
+
     public GameView(Context context, int screenX, int screenY) {
         super(context);
 
@@ -60,6 +63,9 @@ public class GameView extends SurfaceView implements Runnable {
         for(int i=0; i<enemyCount; i++){
             enemies[i] = new Enemy(context, screenX, screenY);
         }
+
+        //initializing boom object
+        blast = new Blast(context);
     }
 
     @Override
@@ -80,6 +86,10 @@ public class GameView extends SurfaceView implements Runnable {
         //updating player position
         player.update();
 
+        //setting boom outside the screen
+        blast.setX(-250);
+        blast.setY(-250);
+
         //Updating the stars with player speed
         for (Star s : stars) {
             s.update(player.getSpeed());
@@ -91,6 +101,11 @@ public class GameView extends SurfaceView implements Runnable {
 
             //if collision occurrs with player
             if (Rect.intersects(player.getDetectCollision(), enemies[i].getDetectCollision())) {
+
+                //displaying boom at that location
+                blast.setX(enemies[i].getX());
+                blast.setY(enemies[i].getY());
+
                 //moving enemy outside the left edge
                 enemies[i].setX(-300);
             }
@@ -133,6 +148,14 @@ public class GameView extends SurfaceView implements Runnable {
                         paint
                 );
             }
+
+            //drawing boom image
+            canvas.drawBitmap(
+                    blast.getBitmap(),
+                    blast.getX(),
+                    blast.getY(),
+                    paint
+            );
 
             //Unlocking the canvas
             surfaceHolder.unlockCanvasAndPost(canvas);

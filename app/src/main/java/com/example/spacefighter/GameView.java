@@ -1,11 +1,12 @@
 package com.example.spacefighter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -49,20 +50,23 @@ public class GameView extends SurfaceView implements Runnable {
 
     //a screenX holder
     int screenX;
-
     //to count the number of Misses
     int countMisses;
-
     //indicator that the enemy has just entered the game screen
     boolean flag ;
-
     //an indicator if the game is Over
     private boolean isGameOver ;
-
     private int gameOverMissCount = 3;
 
     //the score holder
     int score;
+
+    static MediaPlayer gameOnsound;
+    final MediaPlayer killedEnemysound;
+    final MediaPlayer gameOversound;
+
+    //context to be used in onTouchEvent to cause the activity transition from GameAvtivity to MainActivity.
+    Context context;
 
     public GameView(Context context, int screenX, int screenY) {
         super(context);
@@ -105,6 +109,17 @@ public class GameView extends SurfaceView implements Runnable {
 
         //setting the score to 0 initially
         score = 0;
+
+        //initializing the media players for the game sounds
+        gameOnsound = MediaPlayer.create(context,R.raw.gameon_kabir_singh);
+        killedEnemysound = MediaPlayer.create(context,R.raw.killedenemy);
+        gameOversound = MediaPlayer.create(context,R.raw.gameover);
+
+        //starting the game music as the game starts
+        gameOnsound.start();
+
+        //initializing context
+        this.context = context;
     }
 
     @Override
@@ -154,6 +169,9 @@ public class GameView extends SurfaceView implements Runnable {
                 blast.setX(enemies[i].getX());
                 blast.setY(enemies[i].getY());
 
+                //playing a sound at the collision between player and the enemy
+                killedEnemysound.start();
+
                 //moving enemy outside the left edge
                 enemies[i].setX(-300);
             } // the condition where player misses the enemy
@@ -172,6 +190,11 @@ public class GameView extends SurfaceView implements Runnable {
                             //setting playing false to stop the game.
                             playing = false;
                             isGameOver = true;
+
+                            //stopping the gameon music
+                            gameOnsound.stop();
+                            //play the game over sound
+                            gameOversound.start();
                         }
                     }
                 }
@@ -191,6 +214,11 @@ public class GameView extends SurfaceView implements Runnable {
                 playing = false;
                 //setting the isGameOver true as the game is over
                 isGameOver = true;
+
+                //stopping the gameon music
+                gameOnsound.stop();
+                //play the game over sound
+                gameOversound.start();
             }
         }
     }
@@ -307,7 +335,19 @@ public class GameView extends SurfaceView implements Runnable {
                 player.setBoosting();
                 break;
         }
+
+        //if the game's over, tappin on game Over screen sends you to MainActivity
+        if(isGameOver){
+            if(motionEvent.getAction()==MotionEvent.ACTION_DOWN){
+                context.startActivity(new Intent(context,MainActivity.class));
+            }
+        }
         return true;
+    }
+
+    //stop the music on exit
+    public static void stopMusic(){
+        gameOnsound.stop();
     }
 
 }

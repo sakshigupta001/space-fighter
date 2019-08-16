@@ -56,7 +56,7 @@ public class GameView extends SurfaceView implements Runnable {
     boolean flag ;
     //an indicator if the game is Over
     private boolean isGameOver ;
-    private int gameOverMissCount = 3;
+    private int gameOverMissCount = 10;
 
     //the score holder
     int score;
@@ -243,8 +243,9 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             //drawing the score on the game screen
-            paint.setTextSize(30);
-            canvas.drawText("YO \\m/ Score : "+score,100,50,paint);
+            paint.setTextSize(40);
+            canvas.drawText("Current Score : "+score,100,50,paint);
+            canvas.drawText("Miss Left : " + (gameOverMissCount - countMisses),100,100,paint);
 
             //Drawing the player
             canvas.drawBitmap(
